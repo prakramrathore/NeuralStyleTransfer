@@ -3,4 +3,4 @@ tensorflow
 IPython
 matplotlib
 numpy
-PIL
+Pillow

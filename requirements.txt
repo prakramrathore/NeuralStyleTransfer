@@ -1,2 +1,8 @@
 streamlit
 tensorflow
+os
+IPython
+matplotlib
+numpy
+time
+PIL

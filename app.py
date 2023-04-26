@@ -26,7 +26,6 @@ mpl.rcParams['axes.grid'] = False
 import numpy as np
 import PIL.Image
 import time
-import functools
 
 def tensor_to_image(tensor):
   tensor = tensor*255

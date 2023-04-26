@@ -60,7 +60,17 @@ def imshow(image, title=None):
 st.set_page_config(page_title="Neural Style Transfer")
 
 st.title("Neural Style Transfer")
+if st.button("Reload"):
+    # Reload the entire web page when the button is clicked
+    st.write("<script>location.reload();</script>", unsafe_allow_html=True)
 
+st.divider()
+st.markdown("### <span style='color: red;'>Reload the app after every run.</span>", unsafe_allow_html=True)
+st.divider()
+
+st.write("Neural Style Transfer is a technique that uses deep learning to manipulate digital images or videos in order to adopt the appearance or visual style of another image. It takes two images—a content image and a style reference image—and blends them together so the output image looks like the content image, but “painted” in the style of the style reference image. This is achieved by optimizing the output image to match the content statistics of the content image and the style statistics of the style reference image, using a convolutional network.")
+
+st.write("Type of image should be jpg, jpeg or png")
 style_path = st.file_uploader("Upload Style Image", type=["jpg", "jpeg", "png"])
 content_path = st.file_uploader("Upload Content Image", type=["jpg", "jpeg", "png"])
 
@@ -87,16 +97,31 @@ if style_path is not None:
 if content_path is not None:
     content_image = load_img(content_path)
 
-num_epochs = st.slider("Number of Epochs", 1, 100, 5)
-steps = st.slider("Steps per Epoch", 1, 100, 5)
+# st.write("Recommended values for number of epochs and steps per epoch are 2 and 10 respectively.")
+st.markdown("### <span style='color: blue;'>Recommended values for number of epochs and steps per epoch are 2 and 10 respectively.</span>", unsafe_allow_html=True)
+
+num_epochs = st.slider("Number of Epochs", 1, 20, 2)
+steps = st.slider("Steps per Epoch", 1, 20, 10)
 
 
 layers = ['block1_conv1', 'block1_conv2', 'block1_pool', 'block2_conv1', 'block2_conv2', 'block2_pool', 'block3_conv1', 'block3_conv2', 'block3_conv3', 'block3_conv4', 'block3_pool', 'block4_conv1', 'block4_conv2', 'block4_conv3', 'block4_conv4', 'block4_pool', 'block5_conv1', 'block5_conv2', 'block5_conv3', 'block5_conv4', 'block5_pool']
 
-st.write(layers)
+st.write("Layers available in VGG19")
+st.markdown("### <span style='color: green;'>Layers available in VGG19</span>", unsafe_allow_html=True)
+
+
+for layer in layers:
+  st.write(f"- {layer}")
 
 
 # take input from user the index of layers for content and style layers
+
+
+st.markdown("### <span style='color: green;'>Select the layers for content and style layers</span>", unsafe_allow_html=True)
+st.markdown("### <span style='color: green;'>Suggestions:</span>", unsafe_allow_html=True)
+st.markdown("### <span style='color: green;'>block1_conv1, block2_conv1, block3_conv1, block4_conv1, block5_conv1 for Style Layer</span>", unsafe_allow_html=True)
+st.markdown("### <span style='color: green;'>block5_conv2 for Content Layer</span>", unsafe_allow_html=True)
+
 content_layers = st.multiselect("Select Content Layers", layers)
 style_layers = st.multiselect("Select Style Layers", layers)
 
@@ -108,7 +133,6 @@ if st.button("Run"):
     # Run your neural style transfer algorithm here
     # Use the uploaded style and content images, and the values for num_epochs and steps_per_epoch
     # Display the output of the algorithm
-    
   
 
   def vgg_layers(layer_names):
@@ -200,21 +224,24 @@ if st.button("Run"):
       opt.apply_gradients([(grad, image)])
       image.assign(clip_0_1(image))
 
-  import time
-
   start = time.time()
 
   epochs = num_epochs
   steps_per_epoch = steps
 
   step = 0
+  total_steps = epochs * steps_per_epoch
+
+  progress_bar = st.progress(0)
+  time_placeholder = st.empty()
   for n in range(epochs):
-    st.write(f"EPOCHS: {n}")
     for m in range(steps_per_epoch):
       step += 1
       train_step(image)
-      st.write(".", end='', flush=True)
-    st.write("Train step: {}".format(step))
+      progress = (step) / total_steps
+      progress_bar.progress(progress)
+      elapsed_time = time.time() - start
+      time_placeholder.write(f"Time: {elapsed_time:.2f} seconds")
 
   end = time.time()
   st.write("Total time: {:.1f}".format(end-start))

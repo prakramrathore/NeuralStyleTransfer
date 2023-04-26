@@ -12,9 +12,6 @@ import streamlit as st
 
 
 import os
-import tensorflow as tf
-# Load compressed models from tensorflow_hub
-# os.environ['TFHUB_MODEL_LOAD_FORMAT'] = 'COMPRESSED'
 
 import IPython.display as display
 
@@ -34,9 +31,6 @@ def tensor_to_image(tensor):
     assert tensor.shape[0] == 1
     tensor = tensor[0]
   return PIL.Image.fromarray(tensor)
-
-# content_path = tf.keras.utils.get_file('YellowLabradorLooking_new.jpg', 'https://storage.googleapis.com/download.tensorflow.org/example_images/YellowLabradorLooking_new.jpg')
-# style_path = tf.keras.utils.get_file('kandinsky5.jpg','https://storage.googleapis.com/download.tensorflow.org/example_images/Vassily_Kandinsky%2C_1913_-_Composition_7.jpg')
 
 def load_img(path_to_img):
   max_dim = 512
@@ -93,37 +87,14 @@ if style_path is not None:
 if content_path is not None:
     content_image = load_img(content_path)
 
-# style_image = load_img(style_path)
-# content_image = load_img(content_path)
-
-# st.image(style_image, caption="Style Image")
-# st.image(content_image, caption="Content Image")
-
-
 num_epochs = st.slider("Number of Epochs", 1, 100, 5)
 steps = st.slider("Steps per Epoch", 1, 100, 5)
 
-# plt.subplot(1, 2, 1)
-# imshow(content_image, 'Content Image')
-# plt.show()
-
-# plt.subplot(1, 2, 2)
-# imshow(style_image, 'Style Image')
-# plt.show()
 
 layers = ['block1_conv1', 'block1_conv2', 'block1_pool', 'block2_conv1', 'block2_conv2', 'block2_pool', 'block3_conv1', 'block3_conv2', 'block3_conv3', 'block3_conv4', 'block3_pool', 'block4_conv1', 'block4_conv2', 'block4_conv3', 'block4_conv4', 'block4_pool', 'block5_conv1', 'block5_conv2', 'block5_conv3', 'block5_conv4', 'block5_pool']
 
 st.write(layers)
 
-
-
-# content_layers = ['block5_conv2'] 
-
-# style_layers = ['block1_conv1',
-#                 'block2_conv1',
-#                 'block3_conv1', 
-#                 'block4_conv1', 
-#                 'block5_conv1']
 
 # take input from user the index of layers for content and style layers
 content_layers = st.multiselect("Select Content Layers", layers)
@@ -229,21 +200,6 @@ if st.button("Run"):
       opt.apply_gradients([(grad, image)])
       image.assign(clip_0_1(image))
 
-  # train_step(image)
-  # train_step(image)
-  # train_step(image)
-  # tensor_image = tensor_to_image(image)
-
-  # tensor_image.save('output.png')
-
-  # style_extractor = vgg_layers(style_layers)
-  # style_outputs = style_extractor(style_image*255)
-  # extractor = StyleContentModel(style_layers, content_layers)
-  # style_targets = extractor(style_image)['style']
-  # content_targets = extractor(content_image)['content']
-  # image = tf.Variable(content_image)
-
-
   import time
 
   start = time.time()
@@ -253,17 +209,15 @@ if st.button("Run"):
 
   step = 0
   for n in range(epochs):
-    print(f"EPOCHS: {n}")
+    st.write(f"EPOCHS: {n}")
     for m in range(steps_per_epoch):
       step += 1
       train_step(image)
-      print(".", end='', flush=True)
-    # display.clear_output(wait=True)
-    # display.display(tensor_to_image(image))
-    print("Train step: {}".format(step))
+      st.write(".", end='', flush=True)
+    st.write("Train step: {}".format(step))
 
   end = time.time()
-  print("Total time: {:.1f}".format(end-start))
+  st.write("Total time: {:.1f}".format(end-start))
 
   output = tensor_to_image(image)
   output.save('output.png')
